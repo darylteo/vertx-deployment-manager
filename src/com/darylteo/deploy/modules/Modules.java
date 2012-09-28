@@ -4,13 +4,12 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Modules {
 	/* Instance Variables */
 	private Path modulesDir;
-	private List<Module> modules = new ArrayList<>();
+	private Map<String,Module> modules = new HashMap<>();
 
 	/* Constructors */
 	public Modules(Path modulesDir) {
@@ -22,7 +21,21 @@ public class Modules {
 	public Modules(String modulesDir) {
 		this(Paths.get(modulesDir));
 	}
-
+	
+	/* Accessors */
+	public Module[] getModules() {
+		return this.modules.values().toArray(new Module[this.modules.size()]);
+	}
+	
+	public Module getModuleWithName(String name) throws Exception{
+		if(!this.modules.containsKey(name)){
+			// TODO: Custom Exception
+			throw new Exception("Module Not Found");
+		}
+		
+		return this.modules.get(name);
+	}
+	
 	/* Private Methods */
 	private void loadModules() {
 		System.out.printf("Looking for Modules In %s\n", this.modulesDir);
@@ -41,7 +54,7 @@ public class Modules {
 				validateModule(moduleName);
 
 				Module m = new Module(moduleName, "main");
-				this.modules.add(m);
+				this.modules.put(moduleName,m);
 
 				System.out.printf("Module Loaded: %s\n",moduleName);
 			} catch (Exception e) {

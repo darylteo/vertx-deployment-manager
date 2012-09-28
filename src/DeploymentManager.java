@@ -1,24 +1,22 @@
-import java.io.File;
-import java.nio.file.*;
+import java.util.Map;
 
 import org.vertx.java.deploy.Verticle;
 
-import com.darylteo.deploy.modules.Modules;
+import com.darylteo.deploy.core.Core;
+import com.darylteo.deploy.web.WebAdmin;
 
 public class DeploymentManager extends Verticle {
 	
-	private Modules modules;
-	
 	@Override
 	public void start() throws Exception {
-		Path workingDir = Paths.get(System.getProperty("user.dir"));
-		Path modsDir = workingDir.resolve("mods");
-
-		System.out.printf("Running Deployment Manager In %s\n", workingDir);
-
-		this.modules = new Modules(modsDir);
+		/* Start Web Admin Web Server */
+		Core core = new Core(this);
+		WebAdmin admin = new WebAdmin(this);
 		
-		this.container.deployModule("engine");
+		Map<String, String> env = this.container.getEnv();
+		for(String key : env.keySet()){
+			System.out.printf("%s : %s\n",key, env.get(key));
+		}
 	}
 
 
