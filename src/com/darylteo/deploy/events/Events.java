@@ -18,6 +18,7 @@ public class Events {
 		this.eb.registerHandler("deployment-manager.server.ping", new Handler<Message<JsonObject>>() {
 			@Override
 			public void handle(Message<JsonObject> message) {
+				System.out.println("EventBus Received Message: Ping");
 				Events.this.eventsHandler.ping(message.body, new EventReply(message));
 			}
 		});
@@ -25,6 +26,7 @@ public class Events {
 		this.eb.registerHandler("deployment-manager.server.list-modules", new Handler<Message<JsonObject>>() {
 			@Override
 			public void handle(Message<JsonObject> message) {
+				System.out.println("EventBus Received Message: List Modules");
 				Events.this.eventsHandler.getListOfModules(message.body, new EventReply(message));
 			}
 		});
@@ -32,6 +34,7 @@ public class Events {
 		this.eb.registerHandler("deployment-manager.server.list-deployments", new Handler<Message<JsonObject>>() {
 			@Override
 			public void handle(final Message<JsonObject> message) {
+				System.out.println("EventBus Received Message: List Deployments");
 				Events.this.eventsHandler.getListOfDeployments(message.body, new EventReply(message));
 			}
 		});
@@ -39,6 +42,7 @@ public class Events {
 		this.eb.registerHandler("deployment-manager.server.deploy-module", new Handler<Message<JsonObject>>() {
 			@Override
 			public void handle(final Message<JsonObject> message) {
+				System.out.println("EventBus Received Message: Deploy Module");
 				Events.this.eventsHandler.deployModule(message.body, new EventReply(message));
 			}
 		});
@@ -46,6 +50,7 @@ public class Events {
 		this.eb.registerHandler("deployment-manager.server.undeploy-module", new Handler<Message<JsonObject>>() {
 			@Override
 			public void handle(final Message<JsonObject> message) {
+				System.out.println("EventBus Received Message: Undeploy Module");
 				Events.this.eventsHandler.undeployModule(message.body, new EventReply(message));
 			}
 		});

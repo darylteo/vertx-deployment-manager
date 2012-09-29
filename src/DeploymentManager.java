@@ -12,11 +12,6 @@ public class DeploymentManager extends Verticle {
 		/* Start Web Admin Web Server */
 		Core core = new Core(this);
 		WebAdmin admin = new WebAdmin(this);
-		
-		Map<String, String> env = this.container.getEnv();
-		for(String key : env.keySet()){
-			System.out.printf("%s : %s\n",key, env.get(key));
-		}
 	}
 
 
