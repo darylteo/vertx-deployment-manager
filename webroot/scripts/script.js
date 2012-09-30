@@ -8,4 +8,3 @@
 
 	window.App = _app;
 })();
-

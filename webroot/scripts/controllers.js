@@ -28,30 +28,76 @@
 
 		/* Load all the relevant data when loaded */
 		$scope.$on("data-loaded",function(e,data){
-			console.log("Data Loaded: ")
-			console.log(data.modules);
 			$scope.modules = data.modules;
 			$scope.$digest();
 		});
 	})
 
 	.controller("DeploymentsController", function($scope,model){
-		$scope.deployments = [];
+		$scope.deploymentList = [];
+		$scope.deploymentMap = {};
+
+		function loadModules(m){
+			for(i in m){
+				loadModule(m[i]);
+			}
+		}
+		function loadModule(m){
+			entry = {
+				"module_name" : m.module_name,
+				"deployments" : []
+			};
+
+			$scope.deploymentMap[m.module_name] = entry;
+			$scope.deploymentList.push(entry);
+		}
+
+		function loadDeployments(d){
+			for (i in d){
+				loadDeployment(d[i]);
+			}
+		}
+		function loadDeployment(d){
+			var entry = $scope.deploymentMap[d.module_name];
+			console.log("Loaded Entry");
+			console.log(entry);
+			entry.deployments.push({
+				"deployment_id" : d.deployment_id
+			});
+		}
+
 
 		/* Outlet Actions */
 		$scope.deploy = function(name,instances){
 			if(instances > 0){
-				server.deployModule(name,instances);
+				model.deployModule(name,instances);
 			}else{
-				server.undeployModule(name,0-instances);
+				model.undeployModule(name,0-instances);
 			}
 		}
 
 		/* Load all the relevant data when loaded */
 		$scope.$on("data-loaded",function(e,data){
-			$scope.deployments = data.deployments;
+			$scope.deploymentList = [];
+			$scope.deploymentMap = {};
+
+			loadModules(data.modules);
+			loadDeployments(data.deployments);
+
 			$scope.$digest();
 		});
+
+		$scope.$on("new-module",function(e,module){
+			loadModule(module);
+
+			$scope.$digest();
+		});
+		$scope.$on("new-deployment",function(e,deployment){
+			loadDeployment(deployment);
+
+			$scope.$digest();
+		});
+
 	})
 
 	.run(function(model){

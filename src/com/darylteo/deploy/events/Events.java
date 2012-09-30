@@ -32,7 +32,7 @@ public class Events {
 				System.out
 				.println("EventBus Received Message: Load All Data");
 
-				that.eventsHandler.getListOfModules(new EventReply(message), that);
+				that.eventsHandler.loadAllInformation(new EventReply(message), that);
 			}
 		});
 
@@ -91,15 +91,16 @@ public class Events {
 
 	/* Event Sending */
 	public void notifyNewModule(String moduleName) {
-
-		this.eb.send("deployment-manager.client.new-module",
+		System.out.printf("New Module Notificiation {%s}\n",
+				moduleName);
+		this.eb.publish("deployment-manager.client.new-module",
 				new JsonObject().putString("module_name", moduleName));
 	}
 
 	public void notifyNewDeployment(String moduleName, String deploymentID) {
 		System.out.printf("New Deployment Notificiation {%s: %s}\n",
 				moduleName, deploymentID);
-		this.eb.send("deployment-manager.client.new-deployment",
+		this.eb.publish("deployment-manager.client.new-deployment",
 				new JsonObject().putString("module_name", moduleName)
 						.putString("deployment_id", deploymentID));
 	}

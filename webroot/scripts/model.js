@@ -14,9 +14,22 @@
 			console.log("Event Bus Open");
 
 			/* Handlers */
-			registerHandler("new-module", function(data){
-				console.log(data);
-			});
+			var events = [
+				"new-module",
+				"new-deployment"
+			];
+
+			for(i in events){
+				registerHandler(events[i], function(data){
+					(function(){
+						var name = events[i];
+						console.log("Received Message: " + name);
+						console.log(data);
+
+						broadcast(name, data);
+					})();
+				});
+			}
 
 			broadcast("server-open");
 		}
@@ -42,7 +55,6 @@
 					"load-all",
 					{},
 					function(data){
-						console.log(data);
 						broadcast("data-loaded", data);
 					}
 				);
@@ -51,14 +63,13 @@
 			},
 			deployModule : function(name,instances){
 				for(i = 0; i < instances; i++){
-					console.log("Deploy Module");
 					send(
 						"deploy-module",
 						{
 							"module_name" : name
 						},
 						function(r){
-							console.log(JSON.stringify(r));
+							console.log("Deployment: " + JSON.stringify(r));
 						}
 					)
 				}
@@ -96,7 +107,7 @@
 
 			try{
 				eb.send(address,message,function(r){
-					console.log("Complete Sending Message");
+					console.log("Complete Sending Message: " + address);
 					if(replyHandler){
 						replyHandler(r);
 					}
