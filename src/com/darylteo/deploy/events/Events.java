@@ -9,50 +9,98 @@ import org.vertx.java.deploy.Verticle;
 public class Events {
 	private EventsHandler eventsHandler;
 	private EventBus eb;
-	
+
 	public Events(final Verticle verticle, final EventsHandler eventHandler) {
 		this.eventsHandler = eventHandler;
-		
+
 		this.eb = verticle.getVertx().eventBus();
-		
-		this.eb.registerHandler("deployment-manager.server.ping", new Handler<Message<JsonObject>>() {
+
+		final Events that = this;
+
+		this.registerHandler("ping", new Handler<Message<JsonObject>>() {
 			@Override
 			public void handle(Message<JsonObject> message) {
 				System.out.println("EventBus Received Message: Ping");
-				Events.this.eventsHandler.ping(message.body, new EventReply(message));
+				that.eventsHandler.ping(new EventReply(
+						message), that);
 			}
 		});
 
-		this.eb.registerHandler("deployment-manager.server.list-modules", new Handler<Message<JsonObject>>() {
+		this.registerHandler("load-all", new Handler<Message<JsonObject>>() {
 			@Override
 			public void handle(Message<JsonObject> message) {
-				System.out.println("EventBus Received Message: List Modules");
-				Events.this.eventsHandler.getListOfModules(message.body, new EventReply(message));
+				System.out
+				.println("EventBus Received Message: Load All Data");
+
+				that.eventsHandler.getListOfModules(new EventReply(message), that);
 			}
 		});
-		
-		this.eb.registerHandler("deployment-manager.server.list-deployments", new Handler<Message<JsonObject>>() {
-			@Override
-			public void handle(final Message<JsonObject> message) {
-				System.out.println("EventBus Received Message: List Deployments");
-				Events.this.eventsHandler.getListOfDeployments(message.body, new EventReply(message));
-			}
-		});
-		
-		this.eb.registerHandler("deployment-manager.server.deploy-module", new Handler<Message<JsonObject>>() {
-			@Override
-			public void handle(final Message<JsonObject> message) {
-				System.out.println("EventBus Received Message: Deploy Module");
-				Events.this.eventsHandler.deployModule(message.body, new EventReply(message));
-			}
-		});
-		
-		this.eb.registerHandler("deployment-manager.server.undeploy-module", new Handler<Message<JsonObject>>() {
-			@Override
-			public void handle(final Message<JsonObject> message) {
-				System.out.println("EventBus Received Message: Undeploy Module");
-				Events.this.eventsHandler.undeployModule(message.body, new EventReply(message));
-			}
-		});
+
+		this.registerHandler("list-modules",
+				new Handler<Message<JsonObject>>() {
+					@Override
+					public void handle(Message<JsonObject> message) {
+						System.out
+								.println("EventBus Received Message: List Modules");
+						that.eventsHandler.getListOfModules(
+								new EventReply(message), that);
+					}
+				});
+
+		this.registerHandler("list-deployments",
+				new Handler<Message<JsonObject>>() {
+					@Override
+					public void handle(final Message<JsonObject> message) {
+						System.out
+								.println("EventBus Received Message: List Deployments");
+						that.eventsHandler.getListOfDeployments(
+								new EventReply(message), that);
+					}
+				});
+
+		this.registerHandler("deploy-module",
+				new Handler<Message<JsonObject>>() {
+					@Override
+					public void handle(final Message<JsonObject> message) {
+						System.out
+								.println("EventBus Received Message: Deploy Module");
+						that.eventsHandler.deployModule(message.body,
+								new EventReply(message), that);
+					}
+				});
+
+		this.registerHandler("undeploy-module",
+				new Handler<Message<JsonObject>>() {
+					@Override
+					public void handle(final Message<JsonObject> message) {
+						System.out
+								.println("EventBus Received Message: Undeploy Module");
+						that.eventsHandler.undeployModule(message.body,
+								new EventReply(message), that);
+					}
+				});
+	}
+
+	/* Private Methods */
+	private void registerHandler(final String address,
+			final Handler<Message<JsonObject>> handler) {
+		final String serverAddress = "deployment-manager.server." + address;
+
+		this.eb.registerHandler(serverAddress, handler);
+	}
+
+	/* Event Sending */
+	public void notifyNewModule(String moduleName) {
+
+		this.eb.send("deployment-manager.client.new-module",
+				new JsonObject().putString("module_name", moduleName));
+	}
+
+	public void notifyNewDeployment(String moduleName, String deploymentID) {
+		System.out.printf("New Deployment Notificiation {%s: %s}\n",
+				moduleName, deploymentID);
+		this.eb.send("deployment-manager.client.new-deployment",
+				new JsonObject().putString("module_name", moduleName)
+						.putString("deployment_id", deploymentID));
 	}
 }

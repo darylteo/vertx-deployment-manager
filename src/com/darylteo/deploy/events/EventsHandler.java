@@ -4,17 +4,21 @@ import org.vertx.java.core.json.*;
 
 public interface EventsHandler {
 	/* .ping */
-	void ping(JsonObject message, EventReply reply);
-
+	void ping(EventReply reply, Events events);
+	
+	/* .load-all */
+	void loadAllInformation(EventReply reply, Events events);
+	
 	/* .list-modules */
-	void getListOfModules(JsonObject message, EventReply reply);
+	void getListOfModules(EventReply reply, Events events);
 
 	/* .list-deployments */
-	void getListOfDeployments(JsonObject message, EventReply reply);
+	void getListOfDeployments(EventReply reply,
+			Events events);
 
 	/* .deploy-module */
-	void deployModule(JsonObject message, EventReply reply);
+	void deployModule(JsonObject message, EventReply reply, Events events);
 
 	/* .undeploy-module */
-	void undeployModule(JsonObject message, EventReply reply);
+	void undeployModule(JsonObject message, EventReply reply, Events events);
 }

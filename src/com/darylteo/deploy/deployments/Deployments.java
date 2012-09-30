@@ -21,20 +21,12 @@ public class Deployments {
 
 	/* Accessors */
 	public Deployment[] getDeployments() {
-		return this.deployments.values().toArray(new Deployment[this.deployments.size()]);
-	}	
-	
-
-	public void deployModule(Module module) {
-		this.deployModule(module, new JsonObject());
-	}
-
-	public void deployModule(Module module, JsonObject config) {
-		this.deployModule(module, config, 1);
+		return this.deployments.values().toArray(
+				new Deployment[this.deployments.size()]);
 	}
 
 	public void deployModule(final Module module, final JsonObject config,
-			final int instances) {
+			final int instances, final Handler<String> completeHandler) {
 
 		this.container.deployModule(module.getName(), config, instances,
 				new Handler<String>() {
@@ -47,6 +39,8 @@ public class Deployments {
 
 						Deployments.this.deployments.put(deploymentID,
 								deployment);
+
+						completeHandler.handle(deploymentID);
 					}
 
 				});

@@ -3,10 +3,9 @@
 		"App",
 		[
 			"App.Controllers",
-			"App.Server",
 			"App.Model"
 		]);
-	
+
 	window.App = _app;
 })();
 

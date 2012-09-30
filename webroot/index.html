@@ -3,9 +3,9 @@
 	<head>
 		<title>Vertx Deployment Manager</title>
 	</head>
-	<body ng-controller="App2Controller">
+	<body ng-controller="AppController">
 		<h1>Web Admin</h1>
-		
+
 		<div>
 			<h2>Installed Modules</h2>
 			<table ng-controller="ModulesController">
@@ -17,14 +17,14 @@
 				<tbody>
 					<tr>
 						<td ng-repeat="module in modules">
-							{{module.name}}
+							{{module.module_name}}
 						</td>
 					</tr>
 				</tbody>
 			</table>
 			<button type="button" ng-click="refresh()">Refresh</button>
 		</div>
-		
+
 		<div>
 			<h2>Active Deployments</h2>
 			<table ng-controller="DeploymentsController">
@@ -33,34 +33,32 @@
 						<tr>
 							<th>Module Name</th>
 							<th>Deployed</th>
-							<th>Actions</th>							
+							<th>Actions</th>
 						</tr>
 					</tr>
 				</thead>
 				<tbody>
 					<tr ng-repeat="deployment in deployments | orderBy:name">
-						<td>{{deployment.name}}</td>
+						<td>{{deployment.module_name}}</td>
 						<td>{{deployment.deployments.length}}</td>
 						<td>
-							<button type="button" ng-click="deploy(deployment.name,-1)">-1</button>
-							<button type="button" ng-click="deploy(deployment.name,-5)">-5</button>
-							<button type="button" ng-click="deploy(deployment.name,1)">+1</button>
-							<button type="button" ng-click="deploy(deployment.name,5)">+5</button>
+							<button type="button" ng-click="deploy(deployment.module_name,-1)">-1</button>
+							<button type="button" ng-click="deploy(deployment.module_name,-5)">-5</button>
+							<button type="button" ng-click="deploy(deployment.module_name,1)">+1</button>
+							<button type="button" ng-click="deploy(deployment.module_name,5)">+5</button>
 						</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
-		
+
 		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
 		<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/sockjs-client/0.3.2/sockjs-min.js"></script>
 
 		<script type="text/javascript" src="scripts/vertxbus.js"></script>
-		
+
 		<script type="text/javascript" src="scripts/script.js"></script>
 		<script type="text/javascript" src="scripts/controllers.js"></script>
 		<script type="text/javascript" src="scripts/model.js"></script>
-		
-		<script type="text/javascript" src="scripts/server.js"></script>
 	</body>
 </html>

@@ -3,6 +3,7 @@ package com.darylteo.deploy.core;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.deploy.Verticle;
@@ -19,6 +20,7 @@ public class Core {
 
 	private Modules modules;
 	private Deployments deployments;
+	private Core that = this;
 
 	private Events events;
 	private EventsHandler eventsHandler;
@@ -58,70 +60,109 @@ public class Core {
 	private class MyHandler implements EventsHandler {
 
 		@Override
-		public void ping(JsonObject message, EventReply reply) {
+		public void ping(EventReply reply, Events events) {
 			reply.send(new JsonObject().putString("reply", "pong"));
 		}
 
 		@Override
-		public void getListOfModules(JsonObject message, EventReply reply) {
+		public void loadAllInformation(EventReply reply, Events events) {
 			JsonObject replyMessage = new JsonObject();
-			JsonArray replyArray = new JsonArray();
+			JsonArray modulesArray = new JsonArray();
+			JsonArray deploymentsArray = new JsonArray();
 
-			Module[] modules = Core.this.modules.getModules();
+			Module[] modules = that.modules.getModules();
+			Deployment[] deployments = that.deployments.getDeployments();
 
 			for (Module module : modules) {
-				replyArray.addObject(new JsonObject().putString("name",
+				modulesArray.addObject(new JsonObject().putString("module_name",
+						module.getName()));
+			}
+			for (Deployment deployment : deployments) {
+				deploymentsArray.addObject(new JsonObject().putString("module_name",
+						deployment.getDeployedModule().getName()).putString(
+						"deployment_id", deployment.getDeploymentID()));
+			}
+
+			replyMessage.putArray("modules", modulesArray);
+			replyMessage.putArray("deployments", deploymentsArray);
+
+			reply.send(replyMessage);
+		}
+
+		@Override
+		public void getListOfModules(EventReply reply,
+				Events events) {
+			JsonObject replyMessage = new JsonObject();
+			JsonArray modulesArray = new JsonArray();
+
+			Module[] modules = that.modules.getModules();
+			for (Module module : modules) {
+				modulesArray.addObject(new JsonObject().putString("module_name",
 						module.getName()));
 			}
 
-			replyMessage.putArray("modules", replyArray);
+			replyMessage.putArray("modules", modulesArray);
 
 			reply.send(replyMessage);
 		}
 
 		@Override
-		public void getListOfDeployments(JsonObject message, EventReply reply) {
+		public void getListOfDeployments(EventReply reply,
+				Events events) {
 			JsonObject replyMessage = new JsonObject();
-			JsonArray replyArray = new JsonArray();
+			JsonArray deploymentsArray = new JsonArray();
 
-			Deployment[] deployments = Core.this.deployments.getDeployments();
-
+			Deployment[] deployments = that.deployments.getDeployments();
 			for (Deployment deployment : deployments) {
-				replyArray.addObject(new JsonObject().putString("name",
+				deploymentsArray.addObject(new JsonObject().putString("module_name",
 						deployment.getDeployedModule().getName()).putString(
-						"deploymentID", deployment.getDeploymentID()));
+						"deployment_id", deployment.getDeploymentID()));
 			}
 
-			replyMessage.putArray("deployments", replyArray);
+			replyMessage.putArray("deployments", deploymentsArray);
 
 			reply.send(replyMessage);
 		}
 
 		@Override
-		public void deployModule(JsonObject message, EventReply reply) {
-			String moduleName = message.getString("module_name");
-			
-			try{
-				Module module = Core.this.modules.getModuleWithName(moduleName);
-				
-				Core.this.deployments.deployModule(module);
-				reply.send(new JsonObject().putString("success", "1"));
-			}catch(Exception e){
+		public void deployModule(final JsonObject message,
+				final EventReply reply, final Events events) {
+			final String moduleName = message.getString("module_name");
+
+			try {
+				Module module = that.modules.getModuleWithName(moduleName);
+
+				that.deployments.deployModule(module, new JsonObject(), 1,
+						new Handler<String>() {
+							@Override
+							public void handle(String deploymentID) {
+								reply.send(new JsonObject().putString(
+										"success", "1"));
+								events.notifyNewDeployment(moduleName,
+										deploymentID);
+							}
+
+						});
+			} catch (Exception e) {
 				reply.send(new JsonObject().putString("success", "0"));
 			}
 		}
 
 		@Override
-		public void undeployModule(JsonObject message, EventReply reply) {
+		public void undeployModule(JsonObject message, EventReply reply,
+				Events events) {
 			String deploymentID = message.getString("deployment_id");
-			
-			try{			
-				Core.this.deployments.undeployModuleWithDeploymentID(deploymentID);
+
+			try {
+				that.deployments
+						.undeployModuleWithDeploymentID(deploymentID);
 				reply.send(new JsonObject().putString("success", "1"));
-			}catch(Exception e){
+			} catch (Exception e) {
 				reply.send(new JsonObject().putString("success", "0"));
 			}
 		}
+
+
 
 	}
 }
