@@ -6,6 +6,8 @@ import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.deploy.Verticle;
 
+import com.darylteo.deploy.modules.Deployment;
+
 public class Events {
 	private EventsHandler eventsHandler;
 	private EventBus eb;
@@ -93,15 +95,24 @@ public class Events {
 	public void notifyNewModule(String moduleName) {
 		System.out.printf("New Module Notificiation {%s}\n",
 				moduleName);
-		this.eb.publish("deployment-manager.client.new-module",
+		this.eb.publish("deployment-manager.client.module-installed",
 				new JsonObject().putString("module_name", moduleName));
 	}
 
-	public void notifyNewDeployment(String moduleName, String deploymentID) {
+	public void notifyNewDeployment(Deployment deployment) {
 		System.out.printf("New Deployment Notificiation {%s: %s}\n",
-				moduleName, deploymentID);
-		this.eb.publish("deployment-manager.client.new-deployment",
-				new JsonObject().putString("module_name", moduleName)
-						.putString("deployment_id", deploymentID));
+				deployment.getDeployedModule().getName(), deployment.getDeploymentID());
+		
+		this.eb.publish("deployment-manager.client.module-deployed",
+				new JsonObject().putString("module_name", deployment.getDeployedModule().getName())
+						.putString("deployment_id", deployment.getDeploymentID()));
+	}
+	public void notifyUndeployment(Deployment deployment) {
+		System.out.printf("Undeployment Notificiation {%s: %s}\n",
+				deployment.getDeployedModule().getName(), deployment.getDeploymentID());
+		
+		this.eb.publish("deployment-manager.client.module-undeployed",
+				new JsonObject().putString("module_name", deployment.getDeployedModule().getName())
+						.putString("deployment_id", deployment.getDeploymentID()));
 	}
 }

@@ -42,7 +42,8 @@
 						<td>{{deployment.module_name}}</td>
 						<td>{{deployment.deployments.length}}</td>
 						<td>
-							<button type="button" ng-click="deploy(deployment.module_name,1)">Deploy</button>
+							<button type="button" ng-click="deploy(deployment.module_name,1)">+1</button>
+							<button type="button" ng-click="deploy(deployment.module_name,-1)" ng-show="deployment.deployments.length > 0">-1</button>
 						</td>
 					</tr>
 				</tbody>

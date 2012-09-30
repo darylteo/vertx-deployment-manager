@@ -1,6 +1,5 @@
-package com.darylteo.deploy.deployments;
+package com.darylteo.deploy.modules;
 
-import com.darylteo.deploy.modules.Module;
 
 public class Deployment {
 	private String deploymentID;

@@ -8,45 +8,35 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.deploy.Verticle;
 
-import com.darylteo.deploy.deployments.Deployment;
-import com.darylteo.deploy.deployments.Deployments;
 import com.darylteo.deploy.events.EventReply;
 import com.darylteo.deploy.events.EventsHandler;
 import com.darylteo.deploy.events.Events;
+import com.darylteo.deploy.modules.Deployment;
 import com.darylteo.deploy.modules.Module;
 import com.darylteo.deploy.modules.Modules;
 
 public class Core {
 
 	private Modules modules;
-	private Deployments deployments;
 	private Core that = this;
 
 	private Events events;
 	private EventsHandler eventsHandler;
 
 	public Core(final Verticle verticle) {
-		this.modules = this.loadModules();
-
-		this.deployments = this.loadDeployments(verticle);
+		this.modules = this.loadModules(verticle);
 
 		this.eventsHandler = new MyHandler();
 		this.events = this.loadEvents(verticle, this.eventsHandler);
 	}
 
-	private Modules loadModules() {
+	private Modules loadModules(final Verticle verticle) {
 		Path workingDir = Paths.get(System.getProperty("user.dir"));
 		Path modsDir = workingDir.resolve("mods");
 
 		System.out.printf("Running Deployment Manager In %s\n", workingDir);
 
-		return new Modules(modsDir);
-	}
-
-	private Deployments loadDeployments(final Verticle verticle) {
-		Deployments deployments = new Deployments(verticle);
-
-		return deployments;
+		return new Modules(verticle, modsDir);
 	}
 
 	private Events loadEvents(final Verticle verticle,
@@ -71,16 +61,18 @@ public class Core {
 			JsonArray deploymentsArray = new JsonArray();
 
 			Module[] modules = that.modules.getModules();
-			Deployment[] deployments = that.deployments.getDeployments();
+			Deployment[] deployments = that.modules.getDeployments();
 
 			for (Module module : modules) {
-				modulesArray.addObject(new JsonObject().putString("module_name",
-						module.getName()));
+				modulesArray.addObject(new JsonObject().putString(
+						"module_name", module.getName()));
 			}
 			for (Deployment deployment : deployments) {
-				deploymentsArray.addObject(new JsonObject().putString("module_name",
-						deployment.getDeployedModule().getName()).putString(
-						"deployment_id", deployment.getDeploymentID()));
+				deploymentsArray.addObject(new JsonObject()
+						.putString("module_name",
+								deployment.getDeployedModule().getName())
+						.putString("deployment_id",
+								deployment.getDeploymentID()));
 			}
 
 			replyMessage.putArray("modules", modulesArray);
@@ -90,15 +82,14 @@ public class Core {
 		}
 
 		@Override
-		public void getListOfModules(EventReply reply,
-				Events events) {
+		public void getListOfModules(EventReply reply, Events events) {
 			JsonObject replyMessage = new JsonObject();
 			JsonArray modulesArray = new JsonArray();
 
 			Module[] modules = that.modules.getModules();
 			for (Module module : modules) {
-				modulesArray.addObject(new JsonObject().putString("module_name",
-						module.getName()));
+				modulesArray.addObject(new JsonObject().putString(
+						"module_name", module.getName()));
 			}
 
 			replyMessage.putArray("modules", modulesArray);
@@ -107,16 +98,17 @@ public class Core {
 		}
 
 		@Override
-		public void getListOfDeployments(EventReply reply,
-				Events events) {
+		public void getListOfDeployments(EventReply reply, Events events) {
 			JsonObject replyMessage = new JsonObject();
 			JsonArray deploymentsArray = new JsonArray();
 
-			Deployment[] deployments = that.deployments.getDeployments();
+			Deployment[] deployments = that.modules.getDeployments();
 			for (Deployment deployment : deployments) {
-				deploymentsArray.addObject(new JsonObject().putString("module_name",
-						deployment.getDeployedModule().getName()).putString(
-						"deployment_id", deployment.getDeploymentID()));
+				deploymentsArray.addObject(new JsonObject()
+						.putString("module_name",
+								deployment.getDeployedModule().getName())
+						.putString("deployment_id",
+								deployment.getDeploymentID()));
 			}
 
 			replyMessage.putArray("deployments", deploymentsArray);
@@ -130,16 +122,13 @@ public class Core {
 			final String moduleName = message.getString("module_name");
 
 			try {
-				Module module = that.modules.getModuleWithName(moduleName);
-
-				that.deployments.deployModule(module, new JsonObject(), 1,
-						new Handler<String>() {
+				that.modules.deployModule(moduleName, new JsonObject(),
+						new Handler<Deployment>() {
 							@Override
-							public void handle(String deploymentID) {
+							public void handle(Deployment deployment) {
 								reply.send(new JsonObject().putString(
 										"success", "1"));
-								events.notifyNewDeployment(moduleName,
-										deploymentID);
+								events.notifyNewDeployment(deployment);
 							}
 
 						});
@@ -149,20 +138,23 @@ public class Core {
 		}
 
 		@Override
-		public void undeployModule(JsonObject message, EventReply reply,
-				Events events) {
-			String deploymentID = message.getString("deployment_id");
+		public void undeployModule(final JsonObject message,
+				final EventReply reply, final Events events) {
+			String moduleName = message.getString("module_name");
 
 			try {
-				that.deployments
-						.undeployModuleWithDeploymentID(deploymentID);
+				that.modules.undeployModule(moduleName,
+						new Handler<Deployment>() {
+							@Override
+							public void handle(Deployment deployment) {
+								events.notifyUndeployment(deployment);
+							}
+						});
 				reply.send(new JsonObject().putString("success", "1"));
 			} catch (Exception e) {
 				reply.send(new JsonObject().putString("success", "0"));
 			}
 		}
-
-
 
 	}
 }

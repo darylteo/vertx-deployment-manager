@@ -15,20 +15,23 @@
 
 			/* Handlers */
 			var events = [
-				"new-module",
-				"new-deployment"
+				"module-installed",
+				"module-deployed",
+				"module-undeployed"
 			];
 
 			for(i in events){
-				registerHandler(events[i], function(data){
-					(function(){
-						var name = events[i];
-						console.log("Received Message: " + name);
-						console.log(data);
+				(function(){
+					var name = events[i];
+					registerHandler(name, function(data){
+						(function(){
+							console.log("Received Message: " + name);
+							console.log(data);
 
-						broadcast(name, data);
-					})();
-				});
+							broadcast(name, data);
+						})();
+					});
+				}());
 			}
 
 			broadcast("server-open");

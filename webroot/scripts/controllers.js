@@ -54,16 +54,27 @@
 
 		function loadDeployments(d){
 			for (i in d){
-				loadDeployment(d[i]);
+				addDeployment(d[i]);
 			}
 		}
-		function loadDeployment(d){
+		function addDeployment(d){
 			var entry = $scope.deploymentMap[d.module_name];
 			console.log("Loaded Entry");
 			console.log(entry);
 			entry.deployments.push({
 				"deployment_id" : d.deployment_id
 			});
+		}
+		function removeDeployment(d){
+			var entry = $scope.deploymentMap[d.module_name];
+			for(i in entry.deployments){
+				var d = entry.deployments[i];
+				if(d.deployment_id === d.deployment_id){
+					entry.deployments.splice(i,1);
+					return;
+				}
+			}
+
 		}
 
 
@@ -87,13 +98,18 @@
 			$scope.$digest();
 		});
 
-		$scope.$on("new-module",function(e,module){
+		$scope.$on("module-installed",function(e,module){
 			loadModule(module);
 
 			$scope.$digest();
 		});
-		$scope.$on("new-deployment",function(e,deployment){
-			loadDeployment(deployment);
+		$scope.$on("module-deployed",function(e,deployment){
+			addDeployment(deployment);
+
+			$scope.$digest();
+		});
+		$scope.$on("module-undeployed",function(e,deployment){
+			removeDeployment(deployment);
 
 			$scope.$digest();
 		});
