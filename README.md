@@ -22,7 +22,7 @@ Place all your modules into the 'mods' folder of your working directory.
 Simply put the DeploymentManager.jar in your working directory.
 
 ### Create a Configuration File ###
-If you want the deployment manager to deploy verticles upon launch, create a JSON configuration file. <<TODO: Not Supported Yet>>
+If you want the deployment manager to deploy verticles upon launch, create a JSON configuration file. Note that this is not Supported Yet.
 
 ### Running the Deployment Manager ###
 Simply run the deployment manager as you would with normal verticles. (This assumes you have vertx in your PATH, and VERTX_MODS is default).
