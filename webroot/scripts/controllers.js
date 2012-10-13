@@ -107,6 +107,43 @@
 
 	})
 
+	.controller("EventsController", function($scope){
+		$scope.events = [];
+
+		function pushEvent(text){
+			$scope.events.push({
+				text: text,
+				datetime: new Date()
+			});
+
+			$scope.$digest();
+		}
+
+		$scope.$on("data-loaded", function(e){
+			pushEvent("Data Loaded");
+		});
+
+		$scope.$on("module-installed",function(e,module){
+			pushEvent('Module Installed: "' + module.module_name + '"');
+		});
+
+		$scope.$on("module-uninstalled",function(e,module){
+			pushEvent('Module Uninstalled: "' + module.module_name + '"');
+		});
+
+		$scope.$on("module-modified",function(e,module){
+			pushEvent('Module Modified: "' + module.module_name + '"');
+		});
+
+		$scope.$on("module-deployed",function(e,module){
+			pushEvent('Module Deployed: "' + module.module_name + '"');
+		});
+
+		$scope.$on("module-undeployed",function(e,module){
+			pushEvent('Module Undeployed: "' + module.module_name + '"');
+		});
+	})
+
 	.run(function(model){
 		model.connect();
 	});

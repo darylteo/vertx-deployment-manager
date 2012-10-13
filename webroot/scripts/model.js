@@ -31,6 +31,7 @@
 							console.log("Received Message: " + name);
 							console.log(data);
 
+							/* Broadcast to Handlers */
 							broadcast(name, data);
 						})();
 					});

@@ -11,11 +11,9 @@
 			<table ng-controller="DeploymentsController">
 				<thead>
 					<tr>
-						<tr>
-							<th>Module Name</th>
-							<th>Deployed</th>
-							<th>Actions</th>
-						</tr>
+						<th>Module Name</th>
+						<th>Deployed</th>
+						<th>Actions</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -26,6 +24,24 @@
 							<button type="button" ng-click="deploy(deployment.module_name,1)">+1</button>
 							<button type="button" ng-click="deploy(deployment.module_name,-1)" ng-show="deployment.deployments.length > 0">-1</button>
 						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div>
+			<h2>Event Log</h2>
+			<table ng-controller="EventsController">
+				<thead>
+					<tr>
+						<th>Event</th>
+						<th>Date/Time</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="event in events">
+						<td>{{event.text}}</td>
+						<td>{{event.datetime}}</td>
 					</tr>
 				</tbody>
 			</table>
