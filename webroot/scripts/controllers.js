@@ -17,24 +17,7 @@
 		});
 	})
 
-	.controller("ModulesController", function($scope,model){
-		$scope.modules = [];
-
-		/* Push the new module when one is loaded */
-		$scope.$on("new-module",function(e,data){
-			$scope.modules.push(data);
-			$scope.$digest();
-		});
-
-		/* Load all the relevant data when loaded */
-		$scope.$on("data-loaded",function(e,data){
-			$scope.modules = data.modules;
-			$scope.$digest();
-		});
-	})
-
 	.controller("DeploymentsController", function($scope,model){
-		$scope.deploymentList = [];
 		$scope.deploymentMap = {};
 
 		function loadModules(m){
@@ -49,7 +32,9 @@
 			};
 
 			$scope.deploymentMap[m.module_name] = entry;
-			$scope.deploymentList.push(entry);
+		}
+		function unloadModule(m){
+			delete $scope.deploymentMap[m.module_name];
 		}
 
 		function loadDeployments(d){
@@ -103,6 +88,12 @@
 
 			$scope.$digest();
 		});
+		$scope.$on("module-uninstalled",function(e,module){
+			unloadModule(module);
+
+			$scope.$digest();
+		});
+
 		$scope.$on("module-deployed",function(e,deployment){
 			addDeployment(deployment);
 

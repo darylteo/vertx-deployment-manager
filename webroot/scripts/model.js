@@ -16,8 +16,11 @@
 			/* Handlers */
 			var events = [
 				"module-installed",
+				"module-uninstalled",
+				"module-modified",
+
 				"module-deployed",
-				"module-undeployed"
+				"module-undeployed",
 			];
 
 			for(i in events){

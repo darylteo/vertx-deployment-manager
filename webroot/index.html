@@ -7,25 +7,6 @@
 		<h1>Web Admin</h1>
 
 		<div>
-			<h2>Installed Modules</h2>
-			<table ng-controller="ModulesController">
-				<thead>
-					<tr>
-						<th>Module Name</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td ng-repeat="module in modules">
-							{{module.module_name}}
-						</td>
-					</tr>
-				</tbody>
-			</table>
-			<button type="button" ng-click="refresh()">Refresh</button>
-		</div>
-
-		<div>
 			<h2>Active Deployments</h2>
 			<table ng-controller="DeploymentsController">
 				<thead>
@@ -38,7 +19,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="deployment in deploymentList | orderBy:name">
+					<tr ng-repeat="deployment in deploymentMap | orderBy:name">
 						<td>{{deployment.module_name}}</td>
 						<td>{{deployment.deployments.length}}</td>
 						<td>

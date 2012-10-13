@@ -99,13 +99,13 @@ public class Events {
 
 	public void moduleUninstalled(String moduleName) {
 		System.out.printf("Module Uninstalled Notification {%s}\n", moduleName);
-		this.eb.publish("deployment-manager.client.module-installed",
+		this.eb.publish("deployment-manager.client.module-uninstalled",
 				new JsonObject().putString("module_name", moduleName));
 	}
 
 	public void moduleModified(String moduleName) {
 		System.out.printf("Module Modified Notification {%s}\n", moduleName);
-		this.eb.publish("deployment-manager.client.module-installed",
+		this.eb.publish("deployment-manager.client.module-modified",
 				new JsonObject().putString("module_name", moduleName));
 	}
 
