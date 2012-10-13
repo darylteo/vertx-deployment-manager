@@ -9,8 +9,8 @@ import org.vertx.java.deploy.Verticle;
 import com.darylteo.deploy.modules.Deployment;
 
 public class Events {
-	private EventsHandler eventsHandler;
-	private EventBus eb;
+	private final EventsHandler eventsHandler;
+	private final EventBus eb;
 
 	public Events(final Verticle verticle, final EventsHandler eventHandler) {
 		this.eventsHandler = eventHandler;

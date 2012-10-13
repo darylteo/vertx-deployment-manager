@@ -42,7 +42,7 @@ public class ModuleLoader {
 		}
 
 		this.delegate = delegate;
-		
+
 		this.watcher = FileSystems.getDefault().newWatchService();
 		this.keyModuleMap = new HashMap<>();
 
@@ -91,6 +91,7 @@ public class ModuleLoader {
 	 */
 	private void setupWatchService() throws IOException {
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				that.watch();
 			}
@@ -143,7 +144,7 @@ public class ModuleLoader {
 			} catch (InterruptedException e) {
 				return;
 			}
-		
+
 			String moduleName = this.keyModuleMap.get(key);
 
 			try {

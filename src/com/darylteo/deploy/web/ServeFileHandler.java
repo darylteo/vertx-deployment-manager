@@ -12,19 +12,19 @@ public class ServeFileHandler implements Handler<HttpServerRequest> {
 	public void handle(HttpServerRequest request) {
 		Path path = Paths.get(request.uri);
 
-		if(path.equals(Paths.get("/"))){
+		if (path.equals(Paths.get("/"))) {
 			path = path.resolve("index.html");
 		}
 		path = Paths.get("webroot", path.toString());
 
 		System.out.println("File Call: " + path);
-		
+
 		if (!Files.exists(path)) {
 			request.response.statusCode = 404;
 			request.response.end();
 			return;
 		}
-		
+
 		request.response.sendFile(path.toString());
 	}
 }

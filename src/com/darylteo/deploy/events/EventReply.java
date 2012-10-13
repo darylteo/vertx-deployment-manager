@@ -5,7 +5,7 @@ import org.vertx.java.core.json.JsonObject;
 
 public class EventReply {
 
-	private Message<JsonObject> message;
+	private final Message<JsonObject> message;
 
 	public EventReply(Message<JsonObject> message) {
 		super();

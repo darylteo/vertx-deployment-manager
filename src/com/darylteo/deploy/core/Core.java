@@ -9,19 +9,19 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.deploy.Verticle;
 
 import com.darylteo.deploy.events.EventReply;
-import com.darylteo.deploy.events.EventsHandler;
 import com.darylteo.deploy.events.Events;
+import com.darylteo.deploy.events.EventsHandler;
 import com.darylteo.deploy.modules.Deployment;
 import com.darylteo.deploy.modules.Module;
 import com.darylteo.deploy.modules.Modules;
 
 public class Core {
 
-	private Modules modules;
-	private Core that = this;
+	private final Modules modules;
+	private final Core that = this;
 
-	private Events events;
-	private EventsHandler eventsHandler;
+	private final Events events;
+	private final EventsHandler eventsHandler;
 
 	public Core(final Verticle verticle) throws Exception {
 		this.eventsHandler = new MyHandler();

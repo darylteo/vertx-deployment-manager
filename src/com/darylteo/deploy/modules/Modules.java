@@ -2,8 +2,10 @@ package com.darylteo.deploy.modules;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
@@ -58,7 +60,7 @@ public class Modules implements ModuleLoaderDelegate {
 
 		return this.modules.get(name);
 	}
-	
+
 	public boolean hasModuleWithName(String name) {
 		return this.modules.containsKey(name);
 	}
@@ -112,17 +114,17 @@ public class Modules implements ModuleLoaderDelegate {
 		Module m = new Module(moduleName, "main");
 		this.modules.put(moduleName, m);
 		this.deployments.put(moduleName, new LinkedList<Deployment>());
-		
+
 		this.events.moduleInstalled(moduleName);
 	}
 
 	@Override
 	public void moduleModified(String moduleName) {
 		/* Ignore modification events on deleted modules */
-		if(!this.hasModuleWithName(moduleName)){
+		if (!this.hasModuleWithName(moduleName)) {
 			return;
 		}
-		
+
 		this.events.moduleModified(moduleName);
 	}
 
@@ -130,7 +132,7 @@ public class Modules implements ModuleLoaderDelegate {
 	public void moduleUninstalled(String moduleName) {
 		this.modules.remove(moduleName);
 		this.deployments.remove(moduleName);
-		
+
 		this.events.moduleUninstalled(moduleName);
 	}
 
