@@ -52,12 +52,16 @@ public class Modules implements ModuleLoaderDelegate {
 	}
 
 	public Module getModuleWithName(String name) throws Exception {
-		if (!this.modules.containsKey(name)) {
+		if (!this.hasModuleWithName(name)) {
 			// TODO: Custom Exception
 			throw new Exception("Module Not Found");
 		}
 
 		return this.modules.get(name);
+	}
+	
+	public boolean hasModuleWithName(String name) {
+		return this.modules.containsKey(name);
 	}
 
 	/* Deployment Methods */
@@ -115,6 +119,11 @@ public class Modules implements ModuleLoaderDelegate {
 
 	@Override
 	public void moduleModified(String moduleName) {
+		/* Ignore modification events on deleted modules */
+		if(!this.hasModuleWithName(moduleName)){
+			return;
+		}
+		
 		this.events.moduleModified(moduleName);
 	}
 

@@ -76,6 +76,7 @@ public class ModuleLoader {
 					String moduleName = that.folder.relativize(dir).getName(0)
 							.toString();
 					that.registerAll(dir, moduleName);
+					that.delegate.moduleInstalled(moduleName);
 
 					return FileVisitResult.SKIP_SUBTREE;
 				}
@@ -145,7 +146,7 @@ public class ModuleLoader {
 			} catch (InterruptedException e) {
 				return;
 			}
-
+		
 			String moduleName = this.keyModuleMap.get(key);
 
 			try {
