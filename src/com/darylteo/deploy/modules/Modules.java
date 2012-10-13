@@ -9,29 +9,31 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.deploy.Verticle;
 
+import com.darylteo.deploy.events.Events;
+
 public class Modules implements ModuleLoaderDelegate {
 	/* Instance Variables */
-	private Modules that = this;
+	private final Modules that = this;
+	private final Verticle verticle;
 
-	private Verticle verticle;
+	private final Events events;
 
-	private ModuleLoader loader;
-	private Map<String, Module> modules = new HashMap<>();
-	private Map<String, List<Deployment>> deployments = new HashMap<>();
+	private final ModuleLoader loader;
+
+	private final Map<String, Module> modules = new HashMap<>();
+	private final Map<String, List<Deployment>> deployments = new HashMap<>();
 
 	/* Constructors */
-	public Modules(final Verticle verticle, Path modulesDir) {
+	public Modules(final Verticle verticle, final Path modulesDir,
+			final Events events) throws Exception {
 		this.verticle = verticle;
-
-		try {
-			this.loader = new ModuleLoader(modulesDir, this);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		this.events = events;
+		this.loader = new ModuleLoader(modulesDir, this);
 	}
 
-	public Modules(final Verticle verticle, String modulesDir) {
-		this(verticle, Paths.get(modulesDir));
+	public Modules(final Verticle verticle, final String modulesDir,
+			final Events events) throws Exception {
+		this(verticle, Paths.get(modulesDir), events);
 	}
 
 	/* Accessors */
@@ -104,22 +106,24 @@ public class Modules implements ModuleLoaderDelegate {
 	/* Module Loader Delegate methods */
 	@Override
 	public void moduleInstalled(String moduleName) {
-		System.out.println("Module Installed:" + moduleName);
 		Module m = new Module(moduleName, "main");
-		that.modules.put(moduleName, m);
-		that.deployments.put(moduleName, new LinkedList<Deployment>());
+		this.modules.put(moduleName, m);
+		this.deployments.put(moduleName, new LinkedList<Deployment>());
+		
+		this.events.moduleInstalled(moduleName);
 	}
 
 	@Override
 	public void moduleModified(String moduleName) {
-		System.out.println("Module Modified:" + moduleName);
+		this.events.moduleModified(moduleName);
 	}
 
 	@Override
 	public void moduleUninstalled(String moduleName) {
-		System.out.println("Module Uninstalled:" + moduleName);
-		that.modules.remove(moduleName);
-		that.deployments.remove(moduleName);
+		this.modules.remove(moduleName);
+		this.deployments.remove(moduleName);
+		
+		this.events.moduleUninstalled(moduleName);
 	}
 
 }

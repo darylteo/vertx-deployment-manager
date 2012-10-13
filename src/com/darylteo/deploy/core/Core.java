@@ -23,20 +23,22 @@ public class Core {
 	private Events events;
 	private EventsHandler eventsHandler;
 
-	public Core(final Verticle verticle) {
-		this.modules = this.loadModules(verticle);
-
+	public Core(final Verticle verticle) throws Exception {
 		this.eventsHandler = new MyHandler();
 		this.events = this.loadEvents(verticle, this.eventsHandler);
+
+		this.modules = this.loadModules(verticle, this.events);
 	}
 
-	private Modules loadModules(final Verticle verticle) {
+	private Modules loadModules(final Verticle verticle, final Events events)
+			throws Exception {
+
 		Path workingDir = Paths.get(System.getProperty("user.dir"));
 		Path modsDir = workingDir.resolve("mods");
 
 		System.out.printf("Running Deployment Manager In %s\n", workingDir);
 
-		return new Modules(verticle, modsDir);
+		return new Modules(verticle, modsDir, events);
 	}
 
 	private Events loadEvents(final Verticle verticle,
@@ -128,7 +130,7 @@ public class Core {
 							public void handle(Deployment deployment) {
 								reply.send(new JsonObject().putString(
 										"success", "1"));
-								events.notifyNewDeployment(deployment);
+								events.moduleDeployed(deployment);
 							}
 
 						});
@@ -147,7 +149,7 @@ public class Core {
 						new Handler<Deployment>() {
 							@Override
 							public void handle(Deployment deployment) {
-								events.notifyUndeployment(deployment);
+								events.moduleUndeployed(deployment);
 							}
 						});
 				reply.send(new JsonObject().putString("success", "1"));

@@ -23,18 +23,17 @@ public class Events {
 			@Override
 			public void handle(Message<JsonObject> message) {
 				System.out.println("EventBus Received Message: Ping");
-				that.eventsHandler.ping(new EventReply(
-						message), that);
+				that.eventsHandler.ping(new EventReply(message), that);
 			}
 		});
 
 		this.registerHandler("load-all", new Handler<Message<JsonObject>>() {
 			@Override
 			public void handle(Message<JsonObject> message) {
-				System.out
-				.println("EventBus Received Message: Load All Data");
+				System.out.println("EventBus Received Message: Load All Data");
 
-				that.eventsHandler.loadAllInformation(new EventReply(message), that);
+				that.eventsHandler.loadAllInformation(new EventReply(message),
+						that);
 			}
 		});
 
@@ -44,8 +43,8 @@ public class Events {
 					public void handle(Message<JsonObject> message) {
 						System.out
 								.println("EventBus Received Message: List Modules");
-						that.eventsHandler.getListOfModules(
-								new EventReply(message), that);
+						that.eventsHandler.getListOfModules(new EventReply(
+								message), that);
 					}
 				});
 
@@ -55,8 +54,8 @@ public class Events {
 					public void handle(final Message<JsonObject> message) {
 						System.out
 								.println("EventBus Received Message: List Deployments");
-						that.eventsHandler.getListOfDeployments(
-								new EventReply(message), that);
+						that.eventsHandler.getListOfDeployments(new EventReply(
+								message), that);
 					}
 				});
 
@@ -91,28 +90,45 @@ public class Events {
 		this.eb.registerHandler(serverAddress, handler);
 	}
 
-	/* Event Sending */
-	public void notifyNewModule(String moduleName) {
-		System.out.printf("New Module Notificiation {%s}\n",
-				moduleName);
+	/* Module Events */
+	public void moduleInstalled(String moduleName) {
+		System.out.printf("Module Installed Notification {%s}\n", moduleName);
 		this.eb.publish("deployment-manager.client.module-installed",
 				new JsonObject().putString("module_name", moduleName));
 	}
 
-	public void notifyNewDeployment(Deployment deployment) {
-		System.out.printf("New Deployment Notificiation {%s: %s}\n",
-				deployment.getDeployedModule().getName(), deployment.getDeploymentID());
-		
-		this.eb.publish("deployment-manager.client.module-deployed",
-				new JsonObject().putString("module_name", deployment.getDeployedModule().getName())
-						.putString("deployment_id", deployment.getDeploymentID()));
+	public void moduleUninstalled(String moduleName) {
+		System.out.printf("Module Uninstalled Notification {%s}\n", moduleName);
+		this.eb.publish("deployment-manager.client.module-installed",
+				new JsonObject().putString("module_name", moduleName));
 	}
-	public void notifyUndeployment(Deployment deployment) {
-		System.out.printf("Undeployment Notificiation {%s: %s}\n",
-				deployment.getDeployedModule().getName(), deployment.getDeploymentID());
-		
-		this.eb.publish("deployment-manager.client.module-undeployed",
-				new JsonObject().putString("module_name", deployment.getDeployedModule().getName())
-						.putString("deployment_id", deployment.getDeploymentID()));
+
+	public void moduleModified(String moduleName) {
+		System.out.printf("Module Modified Notification {%s}\n", moduleName);
+		this.eb.publish("deployment-manager.client.module-installed",
+				new JsonObject().putString("module_name", moduleName));
+	}
+
+	/* Deployment Events */
+	public void moduleDeployed(Deployment deployment) {
+		System.out.printf("New Deployment Notificiation {%s: %s}\n", deployment
+				.getDeployedModule().getName(), deployment.getDeploymentID());
+
+		this.eb.publish(
+				"deployment-manager.client.module-deployed",
+				new JsonObject().putString("module_name",
+						deployment.getDeployedModule().getName()).putString(
+						"deployment_id", deployment.getDeploymentID()));
+	}
+
+	public void moduleUndeployed(Deployment deployment) {
+		System.out.printf("Undeployment Notificiation {%s: %s}\n", deployment
+				.getDeployedModule().getName(), deployment.getDeploymentID());
+
+		this.eb.publish(
+				"deployment-manager.client.module-undeployed",
+				new JsonObject().putString("module_name",
+						deployment.getDeployedModule().getName()).putString(
+						"deployment_id", deployment.getDeploymentID()));
 	}
 }
