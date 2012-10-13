@@ -13,7 +13,6 @@ import com.darylteo.deploy.events.Events;
 
 public class Modules implements ModuleLoaderDelegate {
 	/* Instance Variables */
-	private final Modules that = this;
 	private final Verticle verticle;
 
 	private final Events events;

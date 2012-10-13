@@ -8,7 +8,6 @@ import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -20,8 +19,6 @@ import java.nio.file.WatchService;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.vertx.java.core.Handler;
 
 public class ModuleLoader {
 	private final ModuleLoader that = this;
