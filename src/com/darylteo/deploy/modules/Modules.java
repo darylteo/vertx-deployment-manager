@@ -1,6 +1,5 @@
 package com.darylteo.deploy.modules;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -10,20 +9,25 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.deploy.Verticle;
 
-public class Modules {
+public class Modules implements ModuleLoaderDelegate {
 	/* Instance Variables */
+	private Modules that = this;
+
 	private Verticle verticle;
 
-	private Path modulesDir;
+	private ModuleLoader loader;
 	private Map<String, Module> modules = new HashMap<>();
 	private Map<String, List<Deployment>> deployments = new HashMap<>();
 
 	/* Constructors */
 	public Modules(final Verticle verticle, Path modulesDir) {
-		this.modulesDir = modulesDir;
 		this.verticle = verticle;
 
-		loadModules();
+		try {
+			this.loader = new ModuleLoader(modulesDir, this);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public Modules(final Verticle verticle, String modulesDir) {
@@ -97,49 +101,25 @@ public class Modules {
 				});
 	}
 
-	/* Private Methods */
-	private void loadModules() {
-		System.out.printf("Looking for Modules In %s\n", this.modulesDir);
-
-		File f = this.modulesDir.toFile();
-		if (!f.exists()) {
-			// Modules Directory does not exist
-			System.out.printf("Modules Directory %s Does Not Exist!\n",
-					this.modulesDir);
-		}
-
-		String[] files = f.list();
-
-		for (String moduleName : files) {
-			try {
-				validateModule(moduleName);
-
-				Module m = new Module(moduleName, "main");
-				this.modules.put(moduleName, m);
-				this.deployments.put(moduleName, new LinkedList<Deployment>());
-
-				System.out.printf("Module Loaded: %s\n", moduleName);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+	/* Module Loader Delegate methods */
+	@Override
+	public void moduleInstalled(String moduleName) {
+		System.out.println("Module Installed:" + moduleName);
+		Module m = new Module(moduleName, "main");
+		that.modules.put(moduleName, m);
+		that.deployments.put(moduleName, new LinkedList<Deployment>());
 	}
 
-	private void validateModule(String moduleName) throws Exception {
-		Path modulePath = this.modulesDir.resolve(moduleName);
-		System.out.printf("Checking Module in Directory: %s\n", modulePath);
-
-		File dir = modulePath.toFile();
-		if (!dir.isDirectory()) {
-			// File is not a Directory, skip this one... We're only looking
-			throw new Exception("Non-Directory detected in Module Directory.");
-		}
-
-		File json = modulePath.resolve("mod.json").toFile();
-
-		if (!json.exists()) {
-			throw new Exception(
-					"mod.json Configuration Found not found for Module.");
-		}
+	@Override
+	public void moduleModified(String moduleName) {
+		System.out.println("Module Modified:" + moduleName);
 	}
+
+	@Override
+	public void moduleUninstalled(String moduleName) {
+		System.out.println("Module Uninstalled:" + moduleName);
+		that.modules.remove(moduleName);
+		that.deployments.remove(moduleName);
+	}
+
 }

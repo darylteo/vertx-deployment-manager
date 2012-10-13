@@ -1,5 +1,3 @@
-import java.util.Map;
-
 import org.vertx.java.deploy.Verticle;
 
 import com.darylteo.deploy.core.Core;
